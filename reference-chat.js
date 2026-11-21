@@ -13,7 +13,7 @@
     {
       match: /\b(?:linkedin|github|instagram|socials?)\b/i,
       text: 'Jayesh links to his LinkedIn, GitHub, and Instagram in the contact section.',
-      links: [['Social links', '#contact'], ['GitHub', 'https://github.com/jayeshofphysics']]
+      links: [['Social links', '#contact'], ['GitHub', 'https://github.com/portfolio-jayesh']]
     },
     {
       match: /\b(?:contact|e-?mail|reach|connect)\b/i,

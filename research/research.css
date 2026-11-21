@@ -606,10 +606,6 @@
   line-height: 1.05;
 }
 
-#research-main section[id] {
-  scroll-margin-block-start: 5.5rem;
-}
-
 #research-main .elite-image img {
   object-position: top center;
 }

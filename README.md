@@ -2,7 +2,7 @@
 
 Research portfolio covering quantum hardware, thin-film optics, and high-pressure spectroscopy, with research case studies, an experience timeline, a downloadable résumé, and a contact form that creates an email draft.
 
-The layout, typography, and transitions are adapted with permission from [Aswin Panengal’s portfolio](https://www.aswinpanengal.me/). Jayesh's portrait, supporting photographs, and the Henri Poincaré quote come from his [earlier portfolio](https://github.com/jayeshofphysics/JayeshJadhav). The footer cartoons, Raman spectrum, and coplanar waveguide image are illustrations.
+The layout, typography, and transitions are adapted with permission from [Aswin Panengal’s portfolio](https://www.aswinpanengal.me/). Jayesh's portrait, supporting photographs, and the Henri Poincaré quote come from his [earlier portfolio](https://github.com/portfolio-jayesh/JayeshJa). The footer cartoons, Raman spectrum, and coplanar waveguide image are illustrations.
 
 ## Local preview and publishing
 

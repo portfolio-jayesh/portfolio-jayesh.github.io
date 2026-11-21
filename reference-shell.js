@@ -69,13 +69,18 @@
 
     if (location.hash) history.replaceState(history.state, '', location.pathname + location.search);
     if (id === 'about') window.dispatchEvent(new Event('portfolio:hero-return'));
-    section.scrollIntoView({ behavior: immediate || reducedMotion.matches ? 'instant' : 'smooth', block: 'start' });
-    const needsTabIndex = !section.hasAttribute('tabindex');
-    if (needsTabIndex) {
-      section.tabIndex = -1;
-      section.addEventListener('blur', () => section.removeAttribute('tabindex'), { once: true });
+
+    const anchor = section.matches('section')
+      ? section.querySelector('[data-scroll-anchor]') ?? section
+      : section;
+    const destination = anchor === section ? section : anchor.querySelector('h2') ?? anchor;
+    anchor.scrollIntoView({ behavior: immediate || reducedMotion.matches ? 'instant' : 'smooth', block: 'start' });
+
+    if (!destination.hasAttribute('tabindex')) {
+      destination.tabIndex = -1;
+      destination.addEventListener('blur', () => destination.removeAttribute('tabindex'), { once: true });
     }
-    section.focus({ preventScroll: true });
+    destination.focus({ preventScroll: true });
     return true;
   }
 
