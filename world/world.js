@@ -499,16 +499,64 @@ const trailDetails = {
     ellipse(.02, -.82, .111, .111, '#3a5959');
     ellipse(-.004, -.844, .038, .033, '#99b2a4');
   },
-  pressure() {
-    block(-.52, -.15, 1.04, .15, '#6a7771');
-    ellipse(-.11, -.54, .39, .37, '#859994');
-    ellipse(-.11, -.54, .28, .264, '#536f69');
-    polygon([[-.30, -.75], [.08, -.75], [-.045, -.547], [-.18, -.547]], '#d2e5df');
-    polygon([[-.18, -.511], [-.045, -.511], [.08, -.31], [-.30, -.31]], '#bdd5d0');
-    block(-.17, -.548, .12, .04, '#be8a60');
-    drawLine([[-.65, -.528], [-.14, -.528]], '#ca6b4f', .025);
-    polygon([[.27, -.50], [.56, -.56], [.62, -.19], [.30, -.168]], '#e1e2c7');
-    drawLine([[.32, -.27], [.37, -.29], [.40, -.39], [.43, -.28], [.52, -.30], [.55, -.40]], '#955d55', .021);
+  pressure(size) {
+    const centerX = -.23;
+    const centerY = -.54;
+    const orbitWidth = .53;
+    const orbitHeight = .255;
+    const beamPort = -.94;
+    const beamX = centerX + orbitWidth * Math.cos(beamPort);
+    const beamY = centerY + orbitHeight * Math.sin(beamPort);
+
+    // The roof is cut away to show the storage ring and its magnets.
+    polygon([[-.87, -.35], [-.58, -.12], [.59, -.12], [.85, -.23], [.84, -.16], [.59, -.045], [-.58, -.045], [-.87, -.27]], '#788c80');
+    polygon([[-.87, -.35], [-.53, -.71], [.58, -.75], [.87, -.53], [.85, -.23], [.59, -.12], [-.58, -.12]], '#9ba99a');
+    ellipse(centerX, centerY + .072, .64, .325, '#5d776f');
+    ellipse(centerX, centerY, .64, .325, '#d0d4bd');
+    ellipse(centerX, centerY, .408, .181, '#91a79b');
+    ellipse(centerX, centerY - .024, .398, .158, '#a8b9a7');
+    ink.beginPath();
+    ink.ellipse(centerX, centerY, orbitWidth, orbitHeight, 0, 0, Math.PI * 2);
+    ink.strokeStyle = '#526d65';
+    ink.lineWidth = .056;
+    ink.stroke();
+    ink.strokeStyle = '#dbbb76';
+    ink.lineWidth = .022;
+    ink.stroke();
+
+    for (let index = 0; index < 9; index++) {
+      const angle = index * Math.PI * 2 / 9 + .18;
+      const tangent = Math.atan2(orbitHeight * Math.cos(angle), -orbitWidth * Math.sin(angle));
+      ink.save();
+      ink.translate(centerX + orbitWidth * Math.cos(angle), centerY + orbitHeight * Math.sin(angle));
+      ink.rotate(tangent);
+      block(-.063, -.045, .126, .09, '#47716d');
+      block(-.051, -.030, .102, .022, '#75a095');
+      ink.restore();
+    }
+
+    ink.save();
+    ink.translate(centerX, centerY - .018);
+    ink.scale(1 / size, 1 / size);
+    ink.fillStyle = '#2e504b';
+    ink.font = `700 ${size * .125}px sans-serif`;
+    ink.textAlign = 'center';
+    ink.textBaseline = 'middle';
+    ink.fillText('INDUS-2', 0, 0);
+    ink.restore();
+
+    // X-rays leave tangentially and continue into the beamline hutch.
+    drawLine([[beamX, beamY], [.648, -.544]], '#526b60', .097);
+    drawLine([[beamX, beamY], [.660, -.540]], '#f0cf84', .037);
+    ellipse(beamX, beamY, .033, .033, '#f0cf84');
+    polygon([[.49, -.70], [.72, -.75], [.85, -.63], [.60, -.58]], '#b7c5ae');
+    polygon([[.49, -.70], [.60, -.58], [.60, -.30], [.49, -.42]], '#738b7d');
+    polygon([[.60, -.58], [.85, -.63], [.85, -.35], [.60, -.30]], '#48685f');
+    polygon([[.622, -.534], [.825, -.575], [.825, -.435], [.622, -.397]], '#304e48');
+    drawLine([[.624, -.474], [.815, -.512]], '#f0cf84', .018);
+    polygon([[.677, -.533], [.764, -.550], [.730, -.494]], '#d2e5df');
+    polygon([[.730, -.479], [.765, -.450], [.679, -.432]], '#bdd5d0');
+    ellipse(.730, -.486, .015, .013, '#d89765');
   },
   masters() {
     for (const [index, color] of ['#95ada6', '#c5b18b', '#8bbcb4'].entries()) {
@@ -538,7 +586,7 @@ function drawRoadsideDetail(detail, x, y, size) {
   ink.translate(x, y);
   ink.scale(size, size);
   ellipse(0, 0, .63, .092, '#31483130');
-  detail();
+  detail(size);
   ink.restore();
 }
 
@@ -644,8 +692,12 @@ function trail() {
     const maxDepth = trailDepth(visibleGround);
     const depth = Math.min(.46 + offset, maxDepth);
     const artworkRoom = compact ? visibleGround - locationBadge.offsetTop - locationBadge.offsetHeight - 8 : 134;
-    const size = Math.min(width * .25, height * .177, limit(artworkRoom, 36, 134)) * (1 + offset);
-    const x = limit(center(depth) + side * width * .29, width * .18, width * .82);
+    const wideProp = scene === 'pressure';
+    const maxSize = wideProp ? 156 : 134;
+    const room = compact ? artworkRoom : maxSize;
+    const size = Math.min(width * (wideProp ? .29 : .25), height * .177, limit(room, 36, maxSize)) * (1 + offset);
+    const rightEdge = wideProp ? Math.min(width * .80, width - size * .90 - 8) : width * .82;
+    const x = limit(center(depth) + side * width * .29, width * .18, rightEdge);
     drawRoadsideDetail(detail, x, yAt(depth), size);
     if (scene === 'karad') {
       drawRoadsideDetail(trailDetails.notebook, width * .22, yAt(Math.min(.51 + offset, maxDepth)), size * .64);
