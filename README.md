@@ -1,8 +1,13 @@
-# Jayesh Jadhav | Experimental Physicist
+# Jayesh Jadhav · Experimental Physicist
 
-Research portfolio covering quantum hardware, thin-film optics, and high-pressure spectroscopy, with research case studies, an experience timeline, a downloadable résumé, and a contact form that creates an email draft.
+I’m a Junior Research Fellow at IIT Bombay, working on indium flip-chip interconnects for quantum devices. My earlier research covers thin-film optics and high-pressure spectroscopy.
 
-The layout, typography, and transitions are adapted with permission from [Aswin Panengal’s portfolio](https://www.aswinpanengal.me/). Jayesh's portrait, supporting photographs, and the Henri Poincaré quote come from his [earlier portfolio](https://github.com/portfolio-jayesh/JayeshJa). The footer cartoons, Raman spectrum, and coplanar waveguide image are illustrations.
+[Live portfolio](https://portfolio-jayesh.github.io/) · [Research documents](research-documents/) · [Collaboration](https://portfolio-jayesh.github.io/research/)
+
+## Research
+
+- **Quantum hardware.** Indium flip-chip interconnects and superconducting coplanar waveguides. [Featured projects](https://portfolio-jayesh.github.io/#projects)
+- **Thesis and lab work.** MSc thesis on transparent electrodes, BARC summer training report with work at INDUS-2, and related project summaries. [Thesis and reports](research-documents/#reports)
 
 ## Local preview and publishing
 
@@ -16,3 +21,9 @@ Run `python -m http.server 8000` at the repository root and open `http://localho
 - `reference-shell.js`, `reference-motion.js`, and `reference-crowd.js` handle navigation and theme, scroll and hero motion, and the animated physicists in the footer.
 - `reference-chat.js` provides a local portfolio guide based on Jayesh's published work. It makes no requests when answering a question.
 - Space Grotesk is served locally from `assets/reference-fonts/`, with its SIL Open Font License.
+
+## Credits
+
+The layout, typography, and transitions are adapted with permission. [Aswin Panengal’s portfolio](https://www.aswinpanengal.me/)
+
+Jayesh’s portrait, supporting photographs, and the Henri Poincaré quote come from his earlier site. The footer cartoons, Raman spectrum, and coplanar waveguide image are illustrations. [Earlier portfolio](https://github.com/portfolio-jayesh/JayeshJa)
