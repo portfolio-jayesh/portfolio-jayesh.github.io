@@ -379,6 +379,7 @@ function globe() {
 const landscapes = {
   village: ['#d5e2d7', '#91a880', '#b9bf8e', '#526a4d'],
   karad: ['#e2e5d5', '#8fa07d', '#c5bf8e', '#637954'],
+  punjab: ['#e6e5d2', '#a4ad81', '#c6c392', '#6b8057'],
   kashmir: ['#c8e0e7', '#84a3ad', '#b2c0a0', '#4a7068'],
   shielding: ['#e5e4d7', '#9da77a', '#b6ac7d', '#5c735e'],
   gap: ['#e7ddce', '#bba68a', '#c1b893', '#67785c'],
@@ -590,6 +591,48 @@ function drawRoadsideDetail(detail, x, y, size) {
   ink.restore();
 }
 
+const placeMarkers = {
+  karad: { side: 1 },
+  punjab: { distance: '≈2,000 KM', side: 1 },
+  gap: { side: 1 },
+  photography: { side: -1 }
+};
+
+function drawPlaceMarker(name, distance, x, ground, opacity) {
+  const titleSize = Math.round(limit(state.width * .035, 13, 19));
+  const detailSize = Math.max(10, titleSize - 4);
+  const titleFont = `700 ${titleSize}px monospace`;
+  const detailFont = `600 ${detailSize}px monospace`;
+  const padding = 10;
+
+  ink.save();
+  ink.globalAlpha *= opacity;
+  ink.font = titleFont;
+  const titleWidth = ink.measureText(name).width;
+  ink.font = detailFont;
+  const detailWidth = distance ? ink.measureText(distance).width : 0;
+  const width = Math.ceil(Math.max(titleWidth, detailWidth)) + padding * 2;
+  const height = titleSize + 10 + (distance ? detailSize + 4 : 0);
+  const center = limit(x, width / 2 + 8, state.width - width / 2 - 8);
+  const left = center - width / 2;
+  const top = ground - height - 17;
+
+  ellipse(center, ground, 13, 3, '#34453433');
+  block(center - 3, top + height, 6, 17, '#715c43');
+  block(left, top, width, height, '#625640');
+  block(left + 1, top + 1, width - 2, height - 2, '#e8dbb8');
+  ink.fillStyle = '#413b2f';
+  ink.textAlign = 'center';
+  ink.textBaseline = 'top';
+  ink.font = titleFont;
+  ink.fillText(name, center, top + 5);
+  if (distance) {
+    ink.font = detailFont;
+    ink.fillText(distance, center, top + titleSize + 8);
+  }
+  ink.restore();
+}
+
 function trail() {
   const { width, height, distance, steer } = state;
   const scene = chapters[state.current].scene || 'village';
@@ -621,9 +664,10 @@ function trail() {
     });
     polygon([...peaks, [width, horizon + 8], [0, horizon + 8]], fill);
   };
+  const lowHorizon = scene === 'punjab';
   if (scene === 'kashmir') drawMountainPeaks(width, relief, horizon, -steer * width * .037);
-  else mountainRange(relief * .24, hills, 2.3 + distance * .06);
-  mountainRange(relief * .12, trees, distance * .10);
+  else mountainRange(relief * (lowHorizon ? .08 : .24), hills, 2.3 + distance * .06);
+  mountainRange(relief * (lowHorizon ? .045 : .12), trees, distance * .10);
   ink.fillStyle = meadow;
   ink.fillRect(0, horizon, width, floor);
 
@@ -702,6 +746,17 @@ function trail() {
     if (scene === 'karad') {
       drawRoadsideDetail(trailDetails.notebook, width * .22, yAt(Math.min(.51 + offset, maxDepth)), size * .64);
     }
+  }
+
+  const nearestChapter = Math.round(distance);
+  const chapter = chapters[nearestChapter];
+  const marker = placeMarkers[chapter.scene];
+  const markerOffset = distance - nearestChapter;
+  const markerOpacity = 1 - 2 * Math.abs(markerOffset);
+  if (marker && markerOpacity > 0) {
+    const depth = Math.min(.70 + markerOffset * .12, trailDepth(visibleGround));
+    const x = center(depth) + marker.side * width * .28;
+    drawPlaceMarker(chapter.place.toUpperCase(), marker.distance, x, yAt(depth), markerOpacity);
   }
 
   // The walker stays visible above the chapter panel and follows steering.
