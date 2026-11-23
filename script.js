@@ -6,6 +6,9 @@
   const studies = [...panel.querySelectorAll('.project-study')];
   const toolbarLabel = panel.querySelector('.project-panel-toolbar > span');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const scrollToAnchor = window.scrollPortfolioAnchor ?? ((anchor, { block }) => {
+    anchor.scrollIntoView({ behavior: reducedMotion.matches ? 'instant' : 'smooth', block });
+  });
   let selectedFolder = null;
 
   function displayStudy(folder) {
@@ -31,7 +34,7 @@
     displayStudy(null);
     if (trigger) {
       trigger.focus({ preventScroll: true });
-      trigger.scrollIntoView({ behavior: reducedMotion.matches ? 'instant' : 'smooth', block: 'nearest' });
+      scrollToAnchor(trigger, { block: 'nearest' });
     }
   }
 
@@ -47,7 +50,7 @@
       detail.open = true;
     }
     panel.focus({ preventScroll: true });
-    panel.scrollIntoView({ behavior: reducedMotion.matches ? 'instant' : 'smooth', block: 'start' });
+    scrollToAnchor(panel, { block: 'start' });
   }
 
   for (const folder of folders) {

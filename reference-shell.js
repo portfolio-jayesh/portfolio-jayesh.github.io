@@ -69,10 +69,80 @@
     return section.matches('section') ? section.querySelector('[data-scroll-anchor]') ?? section : section;
   }
 
+  let scrollFrame = 0;
+  let finishScroll;
+
+  function cancelScroll() {
+    cancelAnimationFrame(scrollFrame);
+    scrollFrame = 0;
+    finishScroll = undefined;
+  }
+
+  function scrollToAnchor(anchor, { block = 'start', immediate = false } = {}) {
+    cancelScroll();
+    const viewport = document.scrollingElement;
+    if (immediate || reducedMotion.matches || !viewport) {
+      anchor.scrollIntoView({ behavior: 'instant', block });
+      return;
+    }
+
+    const origin = scrollY;
+    const bounds = anchor.getBoundingClientRect();
+    const padding = getComputedStyle(viewport);
+    const margin = getComputedStyle(anchor);
+    const start = bounds.top - (parseFloat(padding.scrollPaddingTop) || 0) - (parseFloat(margin.scrollMarginTop) || 0);
+    let offset = start;
+    if (block === 'nearest') {
+      const end = bounds.bottom - viewport.clientHeight + (parseFloat(padding.scrollPaddingBottom) || 0) + (parseFloat(margin.scrollMarginBottom) || 0);
+      // Leave the viewport in place if the anchor fits in it or already spans it.
+      if (start * end <= 0) return;
+      offset = Math.abs(start) <= Math.abs(end) ? start : end;
+    }
+
+    const destination = Math.min(Math.max(0, viewport.scrollHeight - viewport.clientHeight), Math.max(0, origin + offset));
+    const distance = destination - origin;
+    if (!distance) return;
+    const duration = Math.min(1350, 220 + 16 * Math.sqrt(Math.abs(distance)));
+    const startedAt = performance.now();
+
+    function finish() {
+      cancelScroll();
+      window.scrollTo({ top: destination, behavior: 'instant' });
+    }
+
+    function step(now) {
+      const progress = Math.max(0, (now - startedAt) / duration);
+      if (progress >= 1) {
+        finish();
+        return;
+      }
+      // Speed peaks a third of the way through and eases to zero at arrival.
+      const position = 1 - (1 + 3 * progress) * (1 - progress) ** 3;
+      window.scrollTo({ top: origin + distance * position, behavior: 'instant' });
+      scrollFrame = requestAnimationFrame(step);
+    }
+
+    finishScroll = finish;
+    scrollFrame = requestAnimationFrame(step);
+  }
+
+  window.scrollPortfolioAnchor = scrollToAnchor;
+  for (const event of ['wheel', 'pointerdown']) {
+    window.addEventListener(event, cancelScroll, { capture: true, passive: true });
+  }
+  const scrollKeys = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Tab']);
+  window.addEventListener('keydown', event => {
+    if (scrollKeys.has(event.key)) cancelScroll();
+  }, { capture: true });
+  window.addEventListener('pagehide', cancelScroll);
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) finishScroll?.();
+  });
+
   function slideToSection(section, immediate = false) {
     if (location.hash) history.replaceState(history.state, '', location.pathname + location.search);
     if (section.id === 'about') window.dispatchEvent(new Event('portfolio:hero-return'));
-    sectionAnchor(section).scrollIntoView({ behavior: immediate || reducedMotion.matches ? 'instant' : 'smooth', block: 'start' });
+    scrollToAnchor(sectionAnchor(section), { immediate });
   }
 
   function focusSection(section) {
@@ -244,6 +314,7 @@
 
     trigger.addEventListener('click', () => {
       if (dialog.open || dialog.dataset.motion === 'closing') return;
+      cancelScroll();
       previousOverflow = document.body.style.overflow;
       dialog.dataset.motion = 'open';
       dialog.showModal();
@@ -312,7 +383,7 @@
       closeMenu(() => {
         if (section) {
           // Some browsers wait for the modal to close before allowing page scroll.
-          if (slideStartedFrom === undefined || scrollY === slideStartedFrom || reducedMotion.matches) slideToSection(section);
+          if (slideStartedFrom === undefined || (scrollFrame && scrollY === slideStartedFrom) || reducedMotion.matches) slideToSection(section);
           focusSection(section);
           return;
         }
