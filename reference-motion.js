@@ -166,17 +166,25 @@
       if (!animationFrame && destination !== progress) animationFrame = requestAnimationFrame(animatePortrait);
     }
 
-    function measurePortrait() {
+    function stopPortraitAnimation() {
       cancelAnimationFrame(animationFrame);
       animationFrame = 0;
       previousTime = 0;
+    }
+
+    function showStaticPortrait() {
+      stopPortraitAnimation();
       geometry = undefined;
-      about.classList.toggle('portrait-motion-ready', !reducedMotion.matches);
+      about.classList.remove('portrait-motion-ready', 'portrait-motion-active');
+    }
+
+    function measurePortrait() {
       if (reducedMotion.matches) {
-        about.classList.remove('portrait-motion-active');
+        showStaticPortrait();
         return;
       }
 
+      about.classList.add('portrait-motion-ready');
       const section = about.getBoundingClientRect();
       const from = heroPortrait.getBoundingClientRect();
       const to = bioPortrait.getBoundingClientRect();
@@ -184,13 +192,13 @@
       const cardTop = viewportHeight - 20 - to.height;
       const distance = to.top - section.top - cardTop;
       if (distance <= 0 || !to.width || !to.height) {
-        about.classList.remove('portrait-motion-ready', 'portrait-motion-active');
+        showStaticPortrait();
         return;
       }
 
       const scaleX = from.width / to.width;
       const scaleY = from.height / to.height;
-      geometry = {
+      const next = {
         start: section.top + scrollY,
         distance,
         scaleX,
@@ -199,13 +207,22 @@
         offsetY: from.top - section.top - cardTop - (to.height - from.height) / 2,
         startRadius: parseFloat(getComputedStyle(heroPortrait).borderTopLeftRadius) / Math.min(scaleX, scaleY),
         endRadius: parseFloat(getComputedStyle(bioPortrait).borderTopLeftRadius),
+        width: to.width,
+        height: to.height,
+        left: to.left - section.left,
+        top: cardTop,
+        journeyHeight: distance + viewportHeight,
       };
-      journey.style.height = `${distance + viewportHeight}px`;
-      card.style.width = `${to.width}px`;
-      card.style.height = `${to.height}px`;
-      card.style.left = `${to.left - section.left}px`;
-      card.style.top = `${cardTop}px`;
-      progress = destination = clampUnit((scrollY - geometry.start) / distance);
+      if (geometry && Object.keys(next).every(key => Object.is(next[key], geometry[key]))) return;
+
+      stopPortraitAnimation();
+      geometry = next;
+      journey.style.height = `${next.journeyHeight}px`;
+      card.style.width = `${next.width}px`;
+      card.style.height = `${next.height}px`;
+      card.style.left = `${next.left}px`;
+      card.style.top = `${next.top}px`;
+      progress = destination = clampUnit((scrollY - next.start) / next.distance);
       positionCard();
     }
 
@@ -362,8 +379,19 @@
     const canvas = background.querySelector('canvas');
     const fallback = background.querySelector('.glyph-code-fallback');
     if (!canvas || !fallback) return;
-    const context = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false });
+    const context = canvas.getContext('webgl', {
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+      failIfMajorPerformanceCaveat: true,
+    });
     if (!context) return;
+    // Some browsers expose a software context even when the caveat flag is set.
+    const rendererInfo = context.getExtension('WEBGL_debug_renderer_info');
+    if (rendererInfo && /swiftshader|llvmpipe|softpipe|software rasteri[sz]er/i.test(context.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL))) {
+      context.getExtension('WEBGL_lose_context')?.loseContext();
+      return;
+    }
 
     const vertexSource = `
 attribute vec2 position;
@@ -428,6 +456,12 @@ float outline(float kind, float angle, float phase) {
 
 void main() {
   vec2 pixel = vec2(gl_FragCoord.x, size.y - gl_FragCoord.y);
+  float ink = texture2D(atlas, pixel / size).a;
+  // The remaining shader only affects pixels covered by a glyph.
+  if (ink <= 0.0) {
+    gl_FragColor = vec4(0.0);
+    return;
+  }
   vec2 index = floor(pixel / cell);
   vec2 point = (index + 0.5) * cell / dpr;
 
@@ -463,8 +497,6 @@ void main() {
   float cloud = blob * (0.82 + 0.24 * grain);
   float mask = pow(smoothstep(0.47 - 0.2 * activity, 0.84, cloud), 2.6);
 
-  float ink = texture2D(atlas, pixel / size).a;
-
   // Small, quiet islands of code remain visible even without a pointer.
   vec2 viewport = size / dpr;
   vec2 patchSize = vec2(min(110.0, viewport.x * 0.23), 38.0);
@@ -487,7 +519,9 @@ void main() {
 `;
     const atlas = document.createElement('canvas');
     const atlasContext = atlas.getContext('2d');
-    const colorProbe = document.createElement('canvas').getContext('2d');
+    const colorSample = document.createElement('canvas');
+    colorSample.width = colorSample.height = 1;
+    const colorProbe = colorSample.getContext('2d', { willReadFrequently: true });
     if (!atlasContext || !colorProbe) return;
 
     const shaders = [[context.VERTEX_SHADER, vertexSource], [context.FRAGMENT_SHADER, fragmentSource]].map(([type, source]) => {
@@ -525,6 +559,7 @@ void main() {
     context.uniform1f(uniforms.rest, 0.025);
     context.uniform1f(uniforms.haze, 0.08);
     context.uniform1f(uniforms.hoverInk, 0.38);
+    context.clearColor(0, 0, 0, 0);
 
     const code = fallback.textContent.trimEnd();
     const fontSize = 12;
@@ -533,6 +568,8 @@ void main() {
     let width = 0;
     let height = 0;
     let effectiveDpr = 1;
+    let atlasFont;
+    let previousColor;
     let time = 0;
     let lastFrame = 0;
     let frame = 0;
@@ -544,7 +581,10 @@ void main() {
     let trailPoints = [];
 
     function updateColor() {
-      colorProbe.fillStyle = getComputedStyle(background).color;
+      const color = getComputedStyle(background).color;
+      if (color === previousColor) return;
+      previousColor = color;
+      colorProbe.fillStyle = color;
       colorProbe.fillRect(0, 0, 1, 1);
       const [red, green, blue] = colorProbe.getImageData(0, 0, 1, 1).data;
       context.uniform3f(uniforms.color, red / 255, green / 255, blue / 255);
@@ -566,17 +606,12 @@ void main() {
         const remaining = 1 - (time - point.at) / 0.45;
         trail.set([point.x, point.y, 28, 0.18 * remaining ** 2], 4 * index);
       }
-      context.viewport(0, 0, canvas.width, canvas.height);
-      context.uniform2f(uniforms.size, canvas.width, canvas.height);
-      context.uniform2f(uniforms.cell, 8 * effectiveDpr, 18 * effectiveDpr);
-      context.uniform1f(uniforms.dpr, effectiveDpr);
       context.uniform1f(uniforms.time, time);
       context.uniform3f(uniforms.pointer, pointer?.x ?? -1000, pointer?.y ?? -1000, Number(Boolean(pointer)));
       context.uniform1f(uniforms.activity, trailPoints.length / 8);
       context.uniform2f(uniforms.drift, -8 * time, 4 * time);
       context.uniform4fv(uniforms['waves[0]'], waves);
       context.uniform4fv(uniforms['trail[0]'], trail);
-      context.clearColor(0, 0, 0, 0);
       context.clear(context.COLOR_BUFFER_BIT);
       context.drawArrays(context.TRIANGLES, 0, 3);
     }
@@ -599,18 +634,26 @@ void main() {
       return wrapped;
     }
 
-    function measure() {
+    function measure(fontLoaded = false) {
       if (contextLost) return;
       const bounds = background.getBoundingClientRect();
+      const dpr = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(1_500_000 / (bounds.width * bounds.height)));
+      const font = getComputedStyle(background).fontFamily;
+      if (!fontLoaded && width === bounds.width && height === bounds.height && effectiveDpr === dpr && atlasFont === font) return;
       width = bounds.width;
       height = bounds.height;
       if (!width || !height) return;
-      effectiveDpr = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(1_500_000 / (width * height)));
+      effectiveDpr = dpr;
+      atlasFont = font;
       canvas.width = atlas.width = Math.max(1, Math.round(width * effectiveDpr));
       canvas.height = atlas.height = Math.max(1, Math.round(height * effectiveDpr));
+      context.viewport(0, 0, canvas.width, canvas.height);
+      context.uniform2f(uniforms.size, canvas.width, canvas.height);
+      context.uniform2f(uniforms.cell, 8 * effectiveDpr, 18 * effectiveDpr);
+      context.uniform1f(uniforms.dpr, effectiveDpr);
       atlasContext.scale(effectiveDpr, effectiveDpr);
       atlasContext.fillStyle = '#fff';
-      atlasContext.font = `400 ${fontSize}px ${getComputedStyle(background).fontFamily}`;
+      atlasContext.font = `400 ${fontSize}px ${atlasFont}`;
       atlasContext.textBaseline = 'top';
       const lineHeight = 1.7 * fontSize;
       const lineCount = Math.ceil(height / lineHeight);
@@ -694,8 +737,8 @@ void main() {
       followPointer();
     }
 
-    if ('ResizeObserver' in window) new ResizeObserver(measure).observe(background);
-    else window.addEventListener('resize', measure, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(() => measure()).observe(background);
+    else window.addEventListener('resize', () => measure(), { passive: true });
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(([entry]) => {
         active = entry.isIntersecting;
@@ -722,8 +765,8 @@ void main() {
     });
     document.addEventListener('visibilitychange', updateAnimation);
     reducedMotion.addEventListener('change', updateAnimation);
-    document.fonts?.ready.then(measure);
     measure();
+    if (document.fonts?.status === 'loading') document.fonts.ready.then(() => measure(true));
   }
 
   const portfolio = document.querySelector('.portfolio');

@@ -38,3 +38,33 @@
     background: var(--surface-strong);
   }
 }
+
+/* The portfolio and Collaboration opt in to a native page handoff. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-group(root) {
+    animation-duration: 360ms;
+    animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+  }
+
+  html[data-collaboration-pending]::after {
+    content: '';
+    position: fixed;
+    top: env(safe-area-inset-top, 0px);
+    left: 0;
+    z-index: 200;
+    width: 28%;
+    height: 2px;
+    pointer-events: none;
+    background: var(--sc-ink);
+    animation: collaboration-progress 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes collaboration-progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(360%); }
+}

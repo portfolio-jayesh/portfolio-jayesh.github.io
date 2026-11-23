@@ -88,11 +88,46 @@
     return event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey;
   }
 
+  const collaborationUrl = new URL('research/', document.currentScript.src);
+  let collaborationPrefetched = false;
+  let collaborationPendingTimer;
+
+  function isCollaborationLink(link) {
+    return link.origin === collaborationUrl.origin && link.pathname === collaborationUrl.pathname &&
+      location.pathname !== collaborationUrl.pathname;
+  }
+
+  function prefetchCollaboration() {
+    if (collaborationPrefetched || reducedMotion.matches || navigator.connection?.saveData) return;
+    const prefetch = document.createElement('link');
+    prefetch.rel = 'prefetch';
+    prefetch.href = collaborationUrl.href;
+    document.head.append(prefetch);
+    collaborationPrefetched = true;
+  }
+
+  function clearCollaborationPending() {
+    clearTimeout(collaborationPendingTimer);
+    root.removeAttribute('data-collaboration-pending');
+  }
+
+  function showCollaborationPending() {
+    if (reducedMotion.matches) return;
+    clearTimeout(collaborationPendingTimer);
+    root.setAttribute('data-collaboration-pending', '');
+    collaborationPendingTimer = setTimeout(clearCollaborationPending, 10000);
+  }
+
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) clearCollaborationPending();
+  });
+
   document.addEventListener('click', event => {
     if (event.defaultPrevented || !onlyPrimaryClick(event)) return;
     const link = event.target.closest('a[href]');
     if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
     if (scrollToSection(link.href)) event.preventDefault();
+    else if (isCollaborationLink(link)) showCollaborationPending();
   });
   window.addEventListener('hashchange', () => scrollToSection(location.href, true));
   if (location.hash) scrollToSection(location.href, true);
@@ -146,9 +181,10 @@
       const bounds = dialog.getBoundingClientRect();
       const buttonBounds = trigger.getBoundingClientRect();
       const pieces = [...dialog.querySelectorAll('.nav-menu-piece')];
+      const distances = pieces.map(piece => bounds.bottom - piece.getBoundingClientRect().top + 80);
       const stagger = 180 / Math.max(1, pieces.length - 1);
       pieces.forEach((piece, index) => {
-        const distance = bounds.bottom - piece.getBoundingClientRect().top + 80;
+        const distance = distances[index];
         const sideways = (index * 29) % 83 - 41;
         const angle = (index * 37) % 97 - 48;
         const position = ((index * 37) % pieces.length) * stagger;
@@ -228,7 +264,10 @@
         return;
       }
       event.preventDefault();
+      const opensCollaboration = isCollaborationLink(link);
+      if (opensCollaboration) prefetchCollaboration();
       closeMenu(() => {
+        if (opensCollaboration) showCollaborationPending();
         if (!scrollToSection(link.href)) location.assign(link.href);
       });
     });
