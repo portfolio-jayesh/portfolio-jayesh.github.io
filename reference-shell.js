@@ -250,7 +250,7 @@
     let slideFrame;
     const menuAnimations = [];
     const AudioEngine = window.AudioContext ?? window.webkitAudioContext;
-    const menuSoundUrl = new URL('assets/menu-drop-taps.wav', document.currentScript.src);
+    const menuSoundUrl = new URL('assets/menu-ball-drop.wav', document.currentScript.src);
     let menuAudio;
     let menuClip;
     let menuSound;
@@ -278,8 +278,8 @@
         const [clip] = await Promise.all([prepareMenuSound(), animation.ready]);
         if (!clip || menuAudio.state !== 'running' || !dialog.open || animation.playState !== 'running' || document.hidden || reducedMotion.matches) return;
         const offset = Math.max(0, animation.currentTime / 1000);
-        // The WAV starts with 345 ms of silence. Skip it if loading missed the first tap.
-        if (offset >= 0.345) return;
+        // The cue starts after 340 ms of silence. Skip playback if loading missed the start.
+        if (offset >= 0.34) return;
         const source = menuAudio.createBufferSource();
         source.buffer = clip;
         source.connect(menuAudio.destination);
