@@ -39,6 +39,12 @@
   }
 }
 
+.nav-dialog[data-projects-slide]::backdrop {
+  /* Release the live blur while the nearly transparent menu slides away. */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 /* The portfolio and Collaboration opt in to a native page handoff. */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {

@@ -297,13 +297,16 @@
       }
     }
 
-    portfolio.addEventListener('focusin', event => {
+    function revealNavigatedSection(event) {
       for (const section of sections) {
         if (!section.contains(event.target)) continue;
         animations.get(section)?.finish();
         reveal(section);
       }
-    });
+    }
+
+    portfolio.addEventListener('focusin', revealNavigatedSection);
+    portfolio.addEventListener('portfolio:section-navigation', revealNavigatedSection);
     reducedMotion.addEventListener('change', prepareSections);
     prepareSections();
   }

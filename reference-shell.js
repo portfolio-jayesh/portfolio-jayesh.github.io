@@ -55,32 +55,41 @@
     if (event.key === themeKey || event.key === null) setTheme(savedTheme());
   });
 
-  function scrollToSection(href, immediate = false) {
+  function sectionFromLink(href) {
     const url = new URL(href, location.href);
-    if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search || !url.hash) return false;
-    let id;
+    if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search || !url.hash) return null;
     try {
-      id = decodeURIComponent(url.hash.slice(1));
+      return document.getElementById(decodeURIComponent(url.hash.slice(1)));
     } catch {
-      return false;
+      return null;
     }
-    const section = document.getElementById(id);
-    if (!section) return false;
+  }
 
+  function sectionAnchor(section) {
+    return section.matches('section') ? section.querySelector('[data-scroll-anchor]') ?? section : section;
+  }
+
+  function slideToSection(section, immediate = false) {
     if (location.hash) history.replaceState(history.state, '', location.pathname + location.search);
-    if (id === 'about') window.dispatchEvent(new Event('portfolio:hero-return'));
+    if (section.id === 'about') window.dispatchEvent(new Event('portfolio:hero-return'));
+    sectionAnchor(section).scrollIntoView({ behavior: immediate || reducedMotion.matches ? 'instant' : 'smooth', block: 'start' });
+  }
 
-    const anchor = section.matches('section')
-      ? section.querySelector('[data-scroll-anchor]') ?? section
-      : section;
+  function focusSection(section) {
+    const anchor = sectionAnchor(section);
     const destination = anchor === section ? section : anchor.querySelector('h2') ?? anchor;
-    anchor.scrollIntoView({ behavior: immediate || reducedMotion.matches ? 'instant' : 'smooth', block: 'start' });
-
     if (!destination.hasAttribute('tabindex')) {
       destination.tabIndex = -1;
       destination.addEventListener('blur', () => destination.removeAttribute('tabindex'), { once: true });
     }
     destination.focus({ preventScroll: true });
+  }
+
+  function scrollToSection(href, immediate = false) {
+    const section = sectionFromLink(href);
+    if (!section) return false;
+    slideToSection(section, immediate);
+    focusSection(section);
     return true;
   }
 
@@ -167,9 +176,10 @@
 
     let previousOverflow = '';
     let afterClose;
+    let slideTimer;
     const menuAnimations = [];
 
-    function closeMenu(onClosed) {
+    function closeMenu(onClosed, beforeClose) {
       if (!dialog.open || dialog.dataset.motion === 'closing') return;
       afterClose = onClosed;
       dialog.dataset.motion = 'closing';
@@ -207,8 +217,17 @@
         { transform: `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`, transformOrigin: 'top right', opacity: 0 }
       ], shrinkTiming);
       menuAnimations.push(shrink);
-      if ('pseudoElement' in KeyframeEffect.prototype) {
+      const animatesBackdrop = 'pseudoElement' in KeyframeEffect.prototype;
+      if (animatesBackdrop) {
         menuAnimations.push(dialog.animate({ opacity: [1, 0] }, { ...shrinkTiming, pseudoElement: '::backdrop' }));
+      }
+      if (beforeClose && animatesBackdrop) {
+        shrink.ready.then(() => {
+          const startAt = shrinkTiming.delay + shrinkTiming.duration - 160;
+          slideTimer = setTimeout(() => {
+            if (dialog.open && shrink.playState === 'running' && !reducedMotion.matches) beforeClose();
+          }, startAt - shrink.currentTime);
+        }, () => {});
       }
       shrink.finished.then(() => dialog.close(), () => {});
     }
@@ -228,9 +247,11 @@
       closeMenu();
     });
     dialog.addEventListener('close', () => {
+      clearTimeout(slideTimer);
       for (const animation of menuAnimations) animation.cancel();
       menuAnimations.length = 0;
       delete dialog.dataset.motion;
+      delete dialog.dataset.projectsSlide;
       trigger.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = previousOverflow;
       trigger.focus({ preventScroll: true });
@@ -264,12 +285,28 @@
         return;
       }
       event.preventDefault();
+      const section = sectionFromLink(link.href);
       const opensCollaboration = isCollaborationLink(link);
       if (opensCollaboration) prefetchCollaboration();
+
+      let slideStartedFrom;
+      const startProjectsSlide = section?.id === 'projects' ? () => {
+        slideStartedFrom = scrollY;
+        dialog.dataset.projectsSlide = '';
+        section.dispatchEvent(new Event('portfolio:section-navigation', { bubbles: true }));
+        slideToSection(section);
+      } : undefined;
+
       closeMenu(() => {
+        if (section) {
+          // Some browsers wait for the modal to close before allowing page scroll.
+          if (slideStartedFrom === undefined || scrollY === slideStartedFrom || reducedMotion.matches) slideToSection(section);
+          focusSection(section);
+          return;
+        }
         if (opensCollaboration) showCollaborationPending();
-        if (!scrollToSection(link.href)) location.assign(link.href);
-      });
+        location.assign(link.href);
+      }, startProjectsSlide);
     });
   }
 
