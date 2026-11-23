@@ -18,16 +18,16 @@ I am a **Junior Research Fellow at IIT Bombay** working on indium micro-bump int
 | --- | --- | --- |
 | **Indium flip-chip interconnects** · Current | Electroplated indium bumps, interfaces and cleanroom processing for 3D integration of quantum devices | [Project notes](projects/indium-flip-chip/README.md) |
 | **Superconducting coplanar waveguides** · Current | 50 Ω CPW design, TiN thin films, kinetic inductance and microwave modelling | [Project notes](projects/superconducting-cpw/README.md) |
-| **IZO/Ag/IZO transparent electrodes** · MSc thesis | Thin-film optical design and transmission–resistance trade-offs for tandem photovoltaics | [Project notes](projects/transparent-electrodes/README.md) · [Thesis PDF](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/ThesisReport.pdf) |
-| **High-pressure Raman & synchrotron XRD** · BARC / RRCAT | Pressure-dependent spectroscopy of Na₂Cu₂TeO₆ and exposure to INDUS-2 measurements | [Project notes](projects/high-pressure-spectroscopy/README.md) · [Report PDF](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/Jayesh%20BARC%20Report_merged.pdf) |
+| **IZO/Ag/IZO transparent electrodes** · MSc thesis | Thin-film optical design and transmission–resistance trade-offs for tandem photovoltaics | [Project notes](projects/transparent-electrodes/README.md) · [Thesis PDF](https://portfolio-jayesh.github.io/research-documents/msc-thesis.pdf) |
+| **High-pressure Raman & synchrotron XRD** · BARC / RRCAT | Pressure-dependent spectroscopy of Na₂Cu₂TeO₆ and exposure to INDUS-2 measurements | [Project notes](projects/high-pressure-spectroscopy/README.md) · [Report PDF](https://portfolio-jayesh.github.io/research-documents/barc-summer-project.pdf) |
 | **PANI/Fe₃O₄ EMI shielding composite** · BSc project | Magnetic-polymer composite synthesis, structural characterization and VNA testing | [Project notes](projects/emi-shielding/README.md) |
 
 **Research status matters:** optical-performance values are simulation results unless explicitly identified as measurements. My current quantum-device integration work is ongoing; detailed process data and device-performance claims are not publicly released.
 
 ## Reports & research writing
 
-- **[MSc thesis — Multilayer transparent conducting oxides (PDF)](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/ThesisReport.pdf)** · Thin-film optical design, modelling and characterization; IIT Bombay / NCPRE.
-- **[BARC summer project — High-pressure Raman and synchrotron XRD (PDF)](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/Jayesh%20BARC%20Report_merged.pdf)** · Diamond-anvil-cell spectroscopy and INDUS-2 experimental exposure.
+- **[MSc thesis — Multilayer transparent conducting oxides (PDF)](https://portfolio-jayesh.github.io/research-documents/msc-thesis.pdf)** · Thin-film optical design, modelling and characterization; IIT Bombay / NCPRE.
+- **[BARC summer project — High-pressure Raman and synchrotron XRD (PDF)](https://portfolio-jayesh.github.io/research-documents/barc-summer-project.pdf)** · Diamond-anvil-cell spectroscopy and INDUS-2 experimental exposure.
 - **[Research document index](research-documents/README.md)** · Short introductions and cross-links for readers who want the context before opening a long report.
 - **[Research collaboration page](research/)** · Interactive overview of the broader work.
 
@@ -35,7 +35,7 @@ I am a **Junior Research Fellow at IIT Bombay** working on indium micro-bump int
 
 | Device fabrication | Measurement & characterization | Modelling & design |
 | --- | --- | --- |
-| Optical lithography, RF sputtering, evaporation, wet/dry etching, electroplating | Raman spectroscopy, diamond-anvil-cell work, synchrotron XRD, UV–Vis–NIR, four-point probe, profilometry | Python, SETFOS, HFSS, KLayout, multilayer optics, CPW electromagnetic modelling |
+| Optical lithography, RF sputtering, evaporation, electroplating | Raman spectroscopy, diamond-anvil-cell work, synchrotron XRD, UV–Vis–NIR, four-point probe, profilometry | Python, SETFOS, HFSS, KLayout, multilayer optics, CPW electromagnetic modelling |
 
 ## A little beyond the lab
 

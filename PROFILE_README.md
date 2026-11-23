@@ -15,8 +15,8 @@ I work on **electroplated indium micro-bumps for flip-chip integration of quantu
 | --- | --- |
 | **Quantum hardware** | [Indium micro-bump interconnects](https://github.com/portfolio-jayesh/portfolio-jayesh.github.io/blob/main/projects/indium-flip-chip/README.md) |
 | **Superconducting microwaves** | [TiN coplanar waveguides and kinetic inductance](https://github.com/portfolio-jayesh/portfolio-jayesh.github.io/blob/main/projects/superconducting-cpw/README.md) |
-| **Photovoltaic materials** | [IZO/Ag/IZO multilayer optics](https://github.com/portfolio-jayesh/portfolio-jayesh.github.io/blob/main/projects/transparent-electrodes/README.md) · [Thesis PDF](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/ThesisReport.pdf) |
-| **High-pressure physics** | [BARC Raman & INDUS-2 XRD](https://github.com/portfolio-jayesh/portfolio-jayesh.github.io/blob/main/projects/high-pressure-spectroscopy/README.md) · [Report PDF](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/Jayesh%20BARC%20Report_merged.pdf) |
+| **Photovoltaic materials** | [IZO/Ag/IZO multilayer optics](https://github.com/portfolio-jayesh/portfolio-jayesh.github.io/blob/main/projects/transparent-electrodes/README.md) · [Thesis PDF](https://portfolio-jayesh.github.io/research-documents/msc-thesis.pdf) |
+| **High-pressure physics** | [BARC Raman & INDUS-2 XRD](https://github.com/portfolio-jayesh/portfolio-jayesh.github.io/blob/main/projects/high-pressure-spectroscopy/README.md) · [Report PDF](https://portfolio-jayesh.github.io/research-documents/barc-summer-project.pdf) |
 | **Earlier materials research** | [PANI/Fe₃O₄ EMI shielding](https://github.com/portfolio-jayesh/portfolio-jayesh.github.io/blob/main/projects/emi-shielding/README.md) |
 
 **Methods:** optical lithography, sputtering, electrodeposition, spectroscopy · **Software:** Python, HFSS, SETFOS, KLayout.

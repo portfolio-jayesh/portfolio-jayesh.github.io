@@ -8,7 +8,7 @@
     {
       match: /\b(?:résumé|resume|cv|curriculum vitae|download)\b/iu,
       text: 'Jayesh’s résumé covers his research experience, education, projects, and experimental skills.',
-      links: [['Download résumé', 'assets/Jayesh_Jadhav_Resume.pdf']]
+      links: [['Download résumé', 'assets/Jayesh_Jadhav_Resume.pdf?v=20261123']]
     },
     {
       match: /\b(?:linkedin|github|instagram|socials?)\b/i,
@@ -32,7 +32,7 @@
     },
     {
       match: /\b(?:indium|micro.?bumps?|flip.?chip|qubits?|interconnects?|electroplat\w*|quantum hardware)\b/i,
-      text: 'At IIT Bombay, Jayesh works on indium micro-bumps to connect qubit and readout chips. The process uses lithography, sputtering, etching, indium electroplating, and flip-chip bonding for 3D integration.',
+      text: 'At IIT Bombay, Jayesh works on indium micro-bumps to connect qubit and readout chips. The work involves lithography, sputtering, indium electroplating, and flip-chip bonding for 3D integration.',
       links: [['Featured projects', '#projects']]
     },
     {
@@ -47,13 +47,13 @@
     },
     {
       match: /\b(?:skills?|tech stack|tools?|methods?|techniques?|python|software|fabrication|characteri[sz]ation)\b/i,
-      text: 'Jayesh’s skills span fabrication, modelling, and characterisation. His toolkit includes optical lithography, sputtering, etching, Python, HFSS, Setfos, four-point probe measurements, and spectroscopic techniques.',
+      text: 'Jayesh’s skills span fabrication, modelling, and characterisation. His toolkit includes optical lithography, sputtering, Python, HFSS, Setfos, four-point probe measurements, and spectroscopic techniques.',
       links: [['Tech stack', '#skills']]
     },
     {
       match: /\b(?:jrf|fellow|experience|timeline|education|thesis|university|msc|degree)\b/i,
       text: 'Jayesh is a Junior Research Fellow at IIT Bombay. His earlier work includes an MSc project at NCPRE on transparent electrodes, Raman spectroscopy at BARC, synchrotron XRD at RRCAT, and an EMI-shielding composite study at Lovely Professional University.',
-      links: [['Experience timeline', '#experience'], ['Download résumé', 'assets/Jayesh_Jadhav_Resume.pdf']]
+      links: [['Experience timeline', '#experience'], ['Download résumé', 'assets/Jayesh_Jadhav_Resume.pdf?v=20261123']]
     },
     {
       match: /\b(?:photography|trekking|hills|hobbies|hobby|personal|outside|world)\b/i,

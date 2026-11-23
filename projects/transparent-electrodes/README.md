@@ -3,7 +3,7 @@
 **MSc Physics thesis · NCPRE, IIT Bombay · 2025–2026**  
 **Research guide:** Dr. Dinesh Kabra
 
-[← Research index](../../README.md) · **[Original thesis PDF](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/ThesisReport.pdf)** · [Project overview](https://github.com/portfolio-jayesh/JayeshJa/blob/main/thesis-report.html)
+[← Research index](../../README.md) · **[Original thesis PDF](https://portfolio-jayesh.github.io/research-documents/msc-thesis.pdf)** · [Project overview](https://github.com/portfolio-jayesh/msc-tandem-solar-cell-transparent-electrodes)
 
 ## Research question
 
@@ -30,4 +30,4 @@ The modelled gain is **6.5 percentage points** (about **8.3% relative**). The nu
 
 An 8 nm nominal Ag layer may be discontinuous because of island growth. Roughness, interface mixing and deposition conditions can change both optical properties and electrical performance. The full thesis discusses modelling assumptions and experimental considerations.
 
-**[Read the thesis report](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/ThesisReport.pdf)**
+**[Read the thesis report](https://portfolio-jayesh.github.io/research-documents/msc-thesis.pdf)**

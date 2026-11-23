@@ -3,7 +3,7 @@
 **Summer research · Bhabha Atomic Research Centre and RRCAT / INDUS-2 · 2025**  
 **BARC supervisor:** Dr. Subodha Sahoo
 
-[← Research index](../../README.md) · **[BARC project report PDF](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/Jayesh%20BARC%20Report_merged.pdf)** · [Project overview](https://github.com/portfolio-jayesh/JayeshJa/blob/main/barc-report.html)
+[← Research index](../../README.md) · **[BARC project report PDF](https://portfolio-jayesh.github.io/research-documents/barc-summer-project.pdf)** · [Project overview](https://github.com/portfolio-jayesh/barc-high-pressure-raman)
 
 ## Research question
 
@@ -20,4 +20,4 @@ What happens to the lattice vibrations and crystal structure of **Na₂Cu₂TeO�
 
 Changes or emerging features in Raman spectra can **suggest** structural changes, but do not by themselves establish a phase transition. Structural confirmation requires additional evidence, such as diffraction.
 
-**[Read the original report](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/Jayesh%20BARC%20Report_merged.pdf)**
+**[Read the original report](https://portfolio-jayesh.github.io/research-documents/barc-summer-project.pdf)**

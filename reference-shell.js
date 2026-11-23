@@ -249,60 +249,6 @@
     let afterClose;
     let slideFrame;
     const menuAnimations = [];
-    const AudioEngine = window.AudioContext ?? window.webkitAudioContext;
-    const menuSoundUrl = new URL('assets/menu-ball-drop.wav', document.currentScript.src);
-    let menuAudio;
-    let menuClip;
-    let menuSound;
-
-    async function prepareMenuSound() {
-      if (!AudioEngine || reducedMotion.matches) return;
-      try {
-        menuAudio ??= new AudioEngine();
-        const ready = menuAudio.state === 'running' ? undefined : menuAudio.resume();
-        menuClip ??= fetch(menuSoundUrl).then(response => {
-          if (!response.ok) throw new Error('Could not load the menu sound');
-          return response.arrayBuffer();
-        }).then(bytes => menuAudio.decodeAudioData(bytes)).catch(() => {
-          menuClip = undefined;
-        });
-        const [, clip] = await Promise.all([ready, menuClip]);
-        return clip;
-      } catch {
-        // The menu remains usable if audio is blocked or unavailable.
-      }
-    }
-
-    async function playMenuSound(animation) {
-      try {
-        const [clip] = await Promise.all([prepareMenuSound(), animation.ready]);
-        if (!clip || menuAudio.state !== 'running' || !dialog.open || animation.playState !== 'running' || document.hidden || reducedMotion.matches) return;
-        const offset = Math.max(0, animation.currentTime / 1000);
-        // The cue starts after 340 ms of silence. Skip playback if loading missed the start.
-        if (offset >= 0.34) return;
-        const source = menuAudio.createBufferSource();
-        source.buffer = clip;
-        source.connect(menuAudio.destination);
-        source.addEventListener('ended', () => {
-          source.disconnect();
-          if (menuSound === source) menuSound = undefined;
-        }, { once: true });
-        source.start(0, offset);
-        menuSound = source;
-      } catch {
-        // Audio cannot delay or prevent the close animation.
-      }
-    }
-
-    function stopMenuSound() {
-      menuSound?.stop();
-      menuSound = undefined;
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopMenuSound();
-    });
-    window.addEventListener('pagehide', stopMenuSound);
 
     function closeMenu(onClosed, beforeClose) {
       if (!dialog.open || dialog.dataset.motion === 'closing') return;
@@ -345,7 +291,6 @@
         { transform: `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`, transformOrigin: 'top right', opacity: 0 }
       ], shrinkTiming);
       menuAnimations.push(shrink);
-      playMenuSound(shrink);
       const animatesBackdrop = 'pseudoElement' in KeyframeEffect.prototype;
       if (animatesBackdrop) {
         // Ease out the live blur before the falling letters start moving.
@@ -370,7 +315,6 @@
     trigger.addEventListener('click', () => {
       if (dialog.open || dialog.dataset.motion === 'closing') return;
       cancelScroll();
-      prepareMenuSound();
       previousOverflow = document.body.style.overflow;
       dialog.dataset.motion = 'open';
       dialog.showModal();
@@ -387,7 +331,6 @@
       if (reducedMotion.matches && dialog.dataset.motion === 'closing') dialog.close();
     });
     dialog.addEventListener('close', () => {
-      stopMenuSound();
       cancelAnimationFrame(slideFrame);
       for (const animation of menuAnimations) animation.cancel();
       menuAnimations.length = 0;

@@ -27,6 +27,12 @@
   #projects .section-heading h2 br { display: none; }
 }
 
+/* Preserve the road's shape when the first and last roles trade places. */
+@media (width > 1000px) {
+  .journey-roadmap > .journey-stop:first-of-type { padding-top: 0; }
+  .journey-roadmap > .journey-stop:last-of-type { padding-top: 20px; }
+}
+
 /* The opening line overlaps the portrait. Preserve contrast on small screens. */
 @media (max-width: 700px) {
   .hero-portrait-link img,

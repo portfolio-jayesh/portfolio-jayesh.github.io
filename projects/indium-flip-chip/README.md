@@ -12,7 +12,7 @@ How can small, reliable metallic interconnects connect a qubit chip and a separa
 ## My work
 
 - Developing **electroplated indium micro-bumps** for flip-chip and 3D integration.
-- Working through **optical lithography, sputtering, wet/dry etching and electrodeposition** steps in cleanroom-compatible workflows.
+- Working through **optical lithography, sputtering and electrodeposition** steps in cleanroom-compatible workflows.
 - Investigating the roles of seed/under-bump layers, surface conditions and deposition uniformity.
 - Studying related superconducting thin-film and microwave-device requirements.
 
