@@ -566,6 +566,7 @@ void main() {
 
     const code = fallback.textContent.trimEnd();
     const fontSize = 12;
+    const frameInterval = 1000 / 30;
     const waves = new Float32Array(48);
     const trail = new Float32Array(32);
     let width = 0;
@@ -575,6 +576,7 @@ void main() {
     let previousColor;
     let time = 0;
     let lastFrame = 0;
+    let nextFrame = 0;
     let frame = 0;
     let active = false;
     let contextLost = false;
@@ -684,8 +686,11 @@ void main() {
     }
 
     function animate(now) {
-      if (now - lastFrame >= 1000 / 30) {
+      // Keep the cutoff on a steady schedule across small variations in vsync.
+      if (now >= nextFrame - 1) {
         if (lastFrame) time += Math.min((now - lastFrame) / 1000, 0.064);
+        const missed = Math.max(0, Math.floor((now - nextFrame) / frameInterval));
+        nextFrame = lastFrame ? nextFrame + (missed + 1) * frameInterval : now + frameInterval;
         lastFrame = now;
         render();
       }
@@ -695,6 +700,7 @@ void main() {
     function updateAnimation() {
       cancelAnimationFrame(frame);
       lastFrame = 0;
+      nextFrame = 0;
       const running = active && !document.hidden && !reducedMotion.matches && !contextLost;
       background.dataset.animated = String(running);
       if (running) {

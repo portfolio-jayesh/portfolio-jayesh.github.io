@@ -39,8 +39,7 @@
   }
 }
 
-.nav-dialog[data-projects-slide]::backdrop {
-  /* Release the live blur while the nearly transparent menu slides away. */
+.nav-dialog[data-release-backdrop]::backdrop {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }

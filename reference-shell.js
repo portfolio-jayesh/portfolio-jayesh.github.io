@@ -147,6 +147,7 @@
   if (trigger && dialog) {
     const panel = dialog.querySelector('.nav-panel');
     const closeButton = dialog.querySelector('.nav-panel-close');
+    const closeIcon = closeButton?.querySelector('.nav-close-circle');
     const menuLinks = [...dialog.querySelectorAll('.nav-panel-links a[href]')];
     const sectionIds = ['about', 'skills', 'projects', 'experience', 'contact'];
     const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
@@ -176,11 +177,12 @@
 
     let previousOverflow = '';
     let afterClose;
-    let slideTimer;
+    let slideFrame;
     const menuAnimations = [];
 
     function closeMenu(onClosed, beforeClose) {
       if (!dialog.open || dialog.dataset.motion === 'closing') return;
+      const iconTransform = closeIcon && !reducedMotion.matches ? getComputedStyle(closeIcon).transform : 'none';
       afterClose = onClosed;
       dialog.dataset.motion = 'closing';
       if (reducedMotion.matches) {
@@ -192,16 +194,18 @@
       const buttonBounds = trigger.getBoundingClientRect();
       const pieces = [...dialog.querySelectorAll('.nav-menu-piece')];
       const distances = pieces.map(piece => bounds.bottom - piece.getBoundingClientRect().top + 80);
+      const dropDelay = 220;
       const stagger = 180 / Math.max(1, pieces.length - 1);
       pieces.forEach((piece, index) => {
         const distance = distances[index];
         const sideways = (index * 29) % 83 - 41;
         const angle = (index * 37) % 97 - 48;
         const position = ((index * 37) % pieces.length) * stagger;
+        const startTransform = piece === closeIcon ? iconTransform : 'none';
         menuAnimations.push(piece.animate([
-          { transform: 'none' },
+          { transform: startTransform },
           { transform: `translate(${sideways}px, ${distance}px) rotate(${angle}deg)` }
-        ], { delay: 220 + position, duration: 700, fill: 'forwards', easing: 'cubic-bezier(.55,.055,.675,.19)' }));
+        ], { delay: dropDelay + position, duration: 700, fill: startTransform === 'none' ? 'forwards' : 'both', easing: 'cubic-bezier(.55,.055,.675,.19)' }));
         menuAnimations.push(piece.animate({ opacity: [1, 0] }, {
           delay: 760 + index * stagger, duration: 160, fill: 'forwards', easing: 'ease-in'
         }));
@@ -219,15 +223,21 @@
       menuAnimations.push(shrink);
       const animatesBackdrop = 'pseudoElement' in KeyframeEffect.prototype;
       if (animatesBackdrop) {
+        // Ease out the live blur before the falling letters start moving.
+        dialog.dataset.releaseBackdrop = '';
+        menuAnimations.push(dialog.animate({ backdropFilter: ['blur(5px)', 'none'] }, {
+          duration: dropDelay, fill: 'backwards', easing: 'ease-out', pseudoElement: '::backdrop'
+        }));
         menuAnimations.push(dialog.animate({ opacity: [1, 0] }, { ...shrinkTiming, pseudoElement: '::backdrop' }));
       }
       if (beforeClose && animatesBackdrop) {
-        shrink.ready.then(() => {
-          const startAt = shrinkTiming.delay + shrinkTiming.duration - 160;
-          slideTimer = setTimeout(() => {
-            if (dialog.open && shrink.playState === 'running' && !reducedMotion.matches) beforeClose();
-          }, startAt - shrink.currentTime);
-        }, () => {});
+        const slideAt = shrinkTiming.delay + shrinkTiming.duration - 160;
+        function followClose() {
+          if (!dialog.open || shrink.playState !== 'running' || reducedMotion.matches) return;
+          if (shrink.currentTime >= slideAt) beforeClose();
+          else slideFrame = requestAnimationFrame(followClose);
+        }
+        slideFrame = requestAnimationFrame(followClose);
       }
       shrink.finished.then(() => dialog.close(), () => {});
     }
@@ -246,12 +256,15 @@
       event.preventDefault();
       closeMenu();
     });
+    reducedMotion.addEventListener('change', () => {
+      if (reducedMotion.matches && dialog.dataset.motion === 'closing') dialog.close();
+    });
     dialog.addEventListener('close', () => {
-      clearTimeout(slideTimer);
+      cancelAnimationFrame(slideFrame);
       for (const animation of menuAnimations) animation.cancel();
       menuAnimations.length = 0;
       delete dialog.dataset.motion;
-      delete dialog.dataset.projectsSlide;
+      delete dialog.dataset.releaseBackdrop;
       trigger.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = previousOverflow;
       trigger.focus({ preventScroll: true });
@@ -292,7 +305,6 @@
       let slideStartedFrom;
       const startProjectsSlide = section?.id === 'projects' ? () => {
         slideStartedFrom = scrollY;
-        dialog.dataset.projectsSlide = '';
         section.dispatchEvent(new Event('portfolio:section-navigation', { bubbles: true }));
         slideToSection(section);
       } : undefined;
@@ -318,8 +330,7 @@
     let hovering = false;
 
     function rotate() {
-      if (reducedMotion.matches || document.hidden) return;
-      spin?.cancel();
+      if (spin || reducedMotion.matches || document.hidden) return;
       spin = wordmarkText.animate([
         { transform: 'rotate(0deg)', easing: 'linear' },
         { transform: 'rotate(126deg)', offset: .21, easing: 'cubic-bezier(.33,.66,.66,1)' },
