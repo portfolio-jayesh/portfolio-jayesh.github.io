@@ -1,24 +1,21 @@
-# Research documents
+# Reports & project documentation
 
-Reports and project summaries from Jayesh Jadhav’s work in experimental physics.
+A guided reading list for Jayesh Jadhav's experimental-physics research. Longer PDFs are linked to their existing **public GitHub repository** rather than duplicated here.
 
-## Reports
+## Original reports
 
-### Simulation and Optical Design of Multilayer Transparent Conducting Oxides
+| Report | Context | Files |
+| --- | --- | --- |
+| **Simulation and optical design of IZO/Ag/IZO transparent electrodes** | MSc thesis, NCPRE / IIT Bombay, 2026; modelling, fabrication considerations and optical–electrical trade-offs | **[Thesis PDF](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/ThesisReport.pdf)** · [Summary](../projects/transparent-electrodes/README.md) |
+| **High-pressure Raman spectroscopy and synchrotron XRD** | BARC summer training and RRCAT / INDUS-2 work, 2025; Na₂Cu₂TeO₆ | **[BARC report PDF](https://github.com/portfolio-jayesh/JayeshJa/blob/main/Assets/Jayesh%20BARC%20Report_merged.pdf)** · [Summary](../projects/high-pressure-spectroscopy/README.md) |
 
-**MSc Physics thesis · IIT Bombay · 2026**
+## Current research
 
-Optical modelling of IZO/Ag/IZO multilayer electrodes for solar cells, comparing light transmission and electrical conductivity across layer designs. [Thesis PDF](https://portfolio-jayesh.github.io/JayeshJa/Assets/ThesisReport.pdf) · [Project overview](https://portfolio-jayesh.github.io/JayeshJa/thesis-report.html)
+- **[Indium micro-bump interconnects](../projects/indium-flip-chip/README.md)** — ongoing experimental work; public summary only.
+- **[Superconducting CPW modelling](../projects/superconducting-cpw/README.md)** — modelling objectives and physical background; no unpublished simulation data released.
 
-### High-pressure Raman spectroscopy and synchrotron X-ray diffraction
+## Earlier materials project
 
-**Summer training report · BARC and RRCAT · 2025**
+- **[PANI/Fe₃O₄ EMI shielding](../projects/emi-shielding/README.md)** — documented as a project summary; no public raw dataset or full report currently linked.
 
-Raman measurements of Na₂Cu₂TeO₆ in a diamond-anvil cell and high-pressure X-ray diffraction at INDUS-2 Beamline 11. [Report PDF](https://portfolio-jayesh.github.io/JayeshJa/Assets/Jayesh%20BARC%20Report_merged.pdf) · [Project overview](https://portfolio-jayesh.github.io/JayeshJa/barc-report.html)
-
-## Project summaries
-
-- **Quantum hardware.** Indium flip-chip interconnects for 3D device integration and superconducting coplanar waveguide modelling. [Featured projects](https://portfolio-jayesh.github.io/#projects)
-- **Materials and devices.** Thin-film electrodes, high-pressure measurements, and a polyaniline–magnetite composite study for electromagnetic shielding. [Project collection](https://portfolio-jayesh.github.io/research/#project-collection)
-
-For research enquiries, see the project areas and contact details on the Collaboration page. [Research collaboration](https://portfolio-jayesh.github.io/research/)
+**Note:** Modelled optical improvements are presented as simulations. Ongoing quantum-device processes and cryogenic performance are not claimed as validated or publicly released.
